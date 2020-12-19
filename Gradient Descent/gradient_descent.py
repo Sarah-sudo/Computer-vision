@@ -25,7 +25,8 @@ def predict(X, W):
     return preds
 
 # parse our command line arguments
-# construct the argument parse and parse the arguments
+# construct the argument parse and parse the arguments 
+#epoches & learning rate
 ap = argparse.ArgumentParser()
 ap.add_argument("-e", "--epochs", type=float, default=100, help="# of epochs")
 ap.add_argument("-a", "--alpha", type=float, default=0.01, help="Learning rate")
@@ -34,6 +35,7 @@ args = vars(ap.parse_args())
 # generate some data to classify
 ''' generate a 2-class classification problem with 1,000 data points,
 where each data point is a 2D feature vector'''
+# images = 1000, 2D, 2 output class(labels)
 (X, y) = make_blobs(n_samples=1000, n_features=2, centers=2, cluster_std=1.5, random_state=1)
 y = y.reshape(y.shape[0], 1)
 
@@ -47,3 +49,28 @@ X = np.c_[X, np.ones((X.shape[0]))]
 ''' partition the data into training and testing splits using 50% of
 the data for training and the remaining 50% for testing '''
 (trainX, testX, trainY, testY) = train_test_split(X, y, test_size=0.5, random_state=42)
+
+# initialize our weight matrix and list of losses
+print("[INFO] training...")
+W = np.random.randn(X.shape[1], 1)
+losses = []
+
+''' All of our variables are now initialized '''
+
+# Loop over epochs
+for epoch in np.arange(0, args['epochs']):
+    '''take the dot product between our features ‘X‘ and the weight
+       matrix ‘W‘, then pass this value through our sigmoid activation
+       function, thereby giving us our predictions on the dataset'''
+    preds = sigmond_activation(trainX.dot(W))
+    # determine the ‘error‘
+    error = preds - trainY
+    loss = np.sum(error ** 2)
+    losses.append(loss)
+    # compute gradient
+    gradient = trainX.T.dot(error)
+    W +=  -args['alpha'] * gradient
+
+    # check to see if an update should be displayed
+    if epoch == 0 or (epoch + 1) % 5 == 0 :
+        print("[INFO] epoch={}, loss={:.7f}".format(int(epoch + 1), loss))
