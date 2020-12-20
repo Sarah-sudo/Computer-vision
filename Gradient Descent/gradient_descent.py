@@ -58,6 +58,7 @@ losses = []
 ''' All of our variables are now initialized '''
 
 # Loop over epochs
+# use 'np.arange' not 'range' because we are using arguments 
 for epoch in np.arange(0, args['epochs']):
     '''take the dot product between our features ‘X‘ and the weight
        matrix ‘W‘, then pass this value through our sigmoid activation
@@ -74,3 +75,22 @@ for epoch in np.arange(0, args['epochs']):
     # check to see if an update should be displayed
     if epoch == 0 or (epoch + 1) % 5 == 0 :
         print("[INFO] epoch={}, loss={:.7f}".format(int(epoch + 1), loss))
+
+# evaluate our model
+print("[INFO] evaluating...")
+preds = predict(testX, W)
+print(classification_report(testY, preds))
+
+# plot the (testing) classification data
+plt.style.use("ggplot")
+plt.figure()
+plt.title("Data")
+plt.scatter(testX[:, 0], testX[:, 1], marker="o", c=testY, s=30)
+# construct a figure that plots the loss over time
+plt.style.use("ggplot")
+plt.figure()
+plt.plot(np.arange(0, args["epochs"]), losses)
+plt.title("Training Loss")
+plt.xlabel("Epoch #")
+plt.ylabel("Loss")
+plt.show()
