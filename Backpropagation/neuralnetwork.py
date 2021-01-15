@@ -27,10 +27,12 @@ class NeuralNetwork:
         # construct and return a string that represents the network architecture
         return "NeuralNetwork: {}".format("-".join(str(l) for l in self.layers))
 
-    def sigmond(self, x):
+    # forward pass
+    def sigmoid(self, x):
         # compute and return the sigmoid activation value for a given input value
         return 1.0 / (1+np.exp(-x))
 
+    #Backpropagation
     def sigmoid_deriv(self, x):
         '''compute the derivative of the sigmoid function ASSUMING
         that ‘x‘ has already been passed through the ‘sigmoid‘ function'''
@@ -52,4 +54,26 @@ class NeuralNetwork:
                 print("[INFO] epoch={}, loss={:.7f}".format(epoch + 1, loss))
     
     # backpropagation
-    
+    # heart of the backpropagation algorithm -> fit_partial
+    def fit_partial(self, x, y):
+        #storing activation function for each layer
+        A = [np.atleast_2d(x)]
+
+        # FEEDFORWARD:
+        # loop over the layers
+        for i in np.arange(0, len(self.W)):
+            # net input
+            net = A[layer].dot(self.W[layer])
+            # net output
+            out = self.sigmoid(net)
+            # add net output to the list of activation function
+            A.append(out)
+        
+        # BACKPROPAGATION
+        error = A[-1] - y
+        # applying the chain rule
+        D = [error * self.sigmoid_deriv(A[-1])]
+        for layer in np.arange(len(A) - 2, 0 ,-1):
+            delta = D[-1].dot(self.W[layer].T)
+            delta = delta * sigmoid_deriv(A[layer])
+            D.append(delta)
