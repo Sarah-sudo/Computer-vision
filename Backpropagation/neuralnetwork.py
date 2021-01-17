@@ -77,3 +77,12 @@ class NeuralNetwork:
             delta = D[-1].dot(self.W[layer].T)
             delta = delta * sigmoid_deriv(A[layer])
             D.append(delta)
+
+        # the weight update phase
+        D = [::-1]
+        for i in np.arange(0, len(self.W)):
+            # actual learning
+            self.W[layer] += -self.alpha * A[layer].T.dot(D[layer])
+
+    # predict on test set
+    
