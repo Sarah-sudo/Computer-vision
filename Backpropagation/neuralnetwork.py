@@ -79,10 +79,25 @@ class NeuralNetwork:
             D.append(delta)
 
         # the weight update phase
-        D = [::-1]
+        D = D[::-1]
         for i in np.arange(0, len(self.W)):
             # actual learning
             self.W[layer] += -self.alpha * A[layer].T.dot(D[layer])
 
     # predict on test set
+    def predict(self, X, addBias=True):
+        p = np.atleast_2d(x)
+
+        if addBias:
+            p = np.c_[p, np.ones((p.shape[0]))]
     
+        for layer in np.arrange(0, len(self.W)):
+            p = self.sigmoid(np.dot(p, self.W[layer]))
+
+        return p
+
+    def calculate_loss(self, X, targets):
+        targets = np.atleast_2d(targets)
+        prediction = self.predict(X, addBias=False)
+        loss = 0.5 * np.sum((predictions - targets) ** 2)
+        return loss
