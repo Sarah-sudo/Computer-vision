@@ -39,7 +39,7 @@ class NeuralNetwork:
         return x * (1 - x)
 
     # training our NeuralNetwork
-    def fit(self, X, y, epochs=100, displayUpdate=100):
+    def fit(self, X, y, epochs=1000, displayUpdate=100):
         # bias term
         X = np.c_[X, np.ones((X.shape[0]))]
         # loop over epochs
@@ -49,7 +49,7 @@ class NeuralNetwork:
                 self.fit_partial(x, target)
 
             # check to see if we should display a training update
-            if epoch == 0 or (epoch + 1) %displayUpdate == 0:
+            if epoch == 0 or (epoch + 1) % displayUpdate == 0:
                 loss = self.calculate_loss(X, y)
                 print("[INFO] epoch={}, loss={:.7f}".format(epoch + 1, loss))
     
@@ -61,7 +61,7 @@ class NeuralNetwork:
 
         # FEEDFORWARD:
         # loop over the layers
-        for i in np.arange(0, len(self.W)):
+        for layer in np.arange(0, len(self.W)):
             # net input
             net = A[layer].dot(self.W[layer])
             # net output
@@ -75,29 +75,29 @@ class NeuralNetwork:
         D = [error * self.sigmoid_deriv(A[-1])]
         for layer in np.arange(len(A) - 2, 0 ,-1):
             delta = D[-1].dot(self.W[layer].T)
-            delta = delta * sigmoid_deriv(A[layer])
+            delta = delta * self.sigmoid_deriv(A[layer])
             D.append(delta)
 
         # the weight update phase
         D = D[::-1]
-        for i in np.arange(0, len(self.W)):
+        for layer in np.arange(0, len(self.W)):
             # actual learning
             self.W[layer] += -self.alpha * A[layer].T.dot(D[layer])
 
     # predict on test set
     def predict(self, X, addBias=True):
-        p = np.atleast_2d(x)
+        p = np.atleast_2d(X)
 
         if addBias:
             p = np.c_[p, np.ones((p.shape[0]))]
     
-        for layer in np.arrange(0, len(self.W)):
+        for layer in np.arange(0, len(self.W)):
             p = self.sigmoid(np.dot(p, self.W[layer]))
 
         return p
 
     def calculate_loss(self, X, targets):
         targets = np.atleast_2d(targets)
-        prediction = self.predict(X, addBias=False)
+        predictions = self.predict(X, addBias=False)
         loss = 0.5 * np.sum((predictions - targets) ** 2)
         return loss
