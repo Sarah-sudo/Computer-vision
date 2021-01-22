@@ -101,3 +101,4 @@ class NeuralNetwork:
         predictions = self.predict(X, addBias=False)
         loss = 0.5 * np.sum((predictions - targets) ** 2)
         return loss
+        
