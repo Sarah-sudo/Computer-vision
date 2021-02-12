@@ -11,7 +11,7 @@ def convolve(image, K):
     image = cv2.copyMakeBorder(image, pad, pad, pad, pad, cv2.BORDER_REPLICATE)
     output = np.zeros((iH, iW), dtype="float")
 
-    # sliding” the kernel from left-to-right and top-to-bottom
+    # sliding the kernel from left-to-right and top-to-bottom
     for y in np.arange(pad, iH + pad):
         for x in np.arange(pad, iW + pad):
             # extracts the Region of Interest
