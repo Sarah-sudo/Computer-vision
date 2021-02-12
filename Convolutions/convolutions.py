@@ -7,8 +7,8 @@ import cv2
 def convolve(image, K):
     (iH, iW) = image.shape[:2]
     (kH, kW) = K.shape[:2]
-    pad = (kW-1) // 2
-    image = cv2.copyMakeBorder(image, pad, pad, pad, pad,cv2.BORDER_REPLICATE)
+    pad = (kW - 1) // 2
+    image = cv2.copyMakeBorder(image, pad, pad, pad, pad, cv2.BORDER_REPLICATE)
     output = np.zeros((iH, iW), dtype="float")
 
     # sliding” the kernel from left-to-right and top-to-bottom
@@ -25,6 +25,7 @@ def convolve(image, K):
     output = (output * 255).astype("uint8")
     return output
 
+# input path
 ap = argparse.ArgumentParser()
 ap.add_argument("-i", "--image", required=True, help="path to the input image")
 args = vars(ap.parse_args())
@@ -33,5 +34,39 @@ args = vars(ap.parse_args())
 # for bluring
 smallBlur = np.ones((7,7), dtype="float") * (1.0 / (7*7))
 largeBlur = np.ones((21,21), dtype="float") * (1.0 / (21*21))
-
 # for sharping
+sharpen = np.array(([0, -1, 0], [-1, 5, -1], [0, -1, 0]), dtype="int")
+# detect edge-like regions
+laplacian = np.array(([0, 1, 0], [1, -4, 1], [0, 1, 0]), dtype="int")
+#detect edge-like regions along both the x and y axis
+sobelX = np.array(([-1, 0, 1], [-2, 0, 2], [-1, 0, 1]), dtype="int")
+sobelY = np.array(([-1, -2, -1], [0, 0, 0], [1, 2, 1]), dtype="int")
+# emboss kernel
+emboss = np.array(([-2, -1, 0], [-1, 1, 1], [0, 1, 2]), dtype="int")
+
+# kernel bank
+kernelBank = (
+    ("small_blur", smallBlur),
+    ("large_blur", largeBlur),
+    ("sharpen", sharpen),
+    ("laplacian", laplacian),
+    ("sobel_x", sobelX),
+    ("sobel_y", sobelY),
+    ("emboss", emboss))
+
+# load the input image and convert it to grayscale
+image = cv2.imread(args["image"])
+gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+
+# loop over kernels
+for (kernelName, K) in kernelBank:
+    print("[INFO] applying {} kernel".format(kernelName))
+    convolveOutput = convolve(gray, K)
+    opencvOutput = cv2.filter2D(gray, -1, K)
+
+    # show the output images
+    cv2.imshow("Original", gray)
+    cv2.imshow("{} - convole".format(kernelName), convolveOutput)
+    cv2.imshow("{} - opencv".format(kernelName), opencvOutput)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
